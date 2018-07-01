@@ -1,0 +1,18 @@
+
+
+För att få in ett typsnitt i ditt spel
+behöver du först en TTF fil. Det finns några
+i mappen grafik/fonts/ttf, men du får gärna ladda ner andra typsnitt.
+
+Högerklicka på fonts-mappen och välj New... => Font
+Döp fonten till något passande.
+I Properties, Sätt fältet Font till dit valda typssnitt genom att klicka på [...].
+
+Klar!
+
+När du sedan vill använda typsnittet i ett GUI, så när du är inne på GUI:t, högerklickar du på Fonts => Add => Font, och välj ditt typsnitt välj New... => Font
+Döp fonten till något passande.
+I Properties, Sätt fältet Font till dit valda typssnitt genom att klicka på [...].
+
+Klar!
+

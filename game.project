@@ -1,0 +1,11 @@
+[project]
+title = Mitt Plattformsspel
+
+[bootstrap]
+main_collection = /main/main.collectionc
+
+[display]
+high_dpi = 0
+width = 798
+height = 450
+

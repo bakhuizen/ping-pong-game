@@ -1,0 +1,35 @@
+local direction = 0
+local speed = 300
+
+function init(self)
+	msg.post('.', 'acquire_input_focus')
+end
+
+function update(self, dt)
+	pos = go.get_position()
+	pos.y = pos.y + direction * speed * dt
+
+	if pos.y < 80 then
+		pos.y = 80
+	elseif pos.y > 370 then
+		pos.y = 370
+	end
+
+	go.set_position(pos)
+end
+
+function on_message(self, message_id, message, sender)
+
+end
+
+function on_input(self, action_id, action)
+	if action_id == hash('W') then
+		direction = 1
+	elseif action_id == hash('S') then
+		direction = -1
+	end
+
+	if action.released then
+		direction = 0
+	end
+end

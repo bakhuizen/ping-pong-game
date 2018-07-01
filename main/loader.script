@@ -1,0 +1,62 @@
+
+-- Den nästa världen som ska laddas.
+local nästa = nil
+
+-- Den nuvarande världen.
+local nuvarande = nil
+
+function init(self)
+
+	-- Vi måste ha input focus, annars kan inga världar vi laddar in få input focus.
+	msg.post('.', 'acquire_input_focus')
+
+	-- Börja med att ladda in start-collektionen.
+	msg.post('.', 'ladda_värld', { till = '#start'})
+
+	-- Blå bakgrundsfärg :)
+	msg.post('@render:', 'clear_color', {color = vmath.vector4(125/255, 200/255, 230/255, 1)})
+	
+end
+
+function final(self)
+	msg.post('.', 'release_input_focus')
+end
+
+function on_message(self, message_id, message, sender)
+
+	-- Om en värld nyss har laddats in...
+	if message_id == hash('proxy_loaded') then
+
+		-- Vi måste skicka det här meddelandet, så att världen visas.
+		msg.post(sender, 'enable')
+
+		-- Den nuvarande världen är nu den som förut var nästa värld.
+		nuvarande = nästa
+
+		-- Just nu har vi ingen nästa värld.
+		nästa = nil
+	elseif message_id == hash('proxy_unloaded') then
+
+		-- Om en värld har laddats ur, har vi ingen nuvarande värld.
+		nuvarande = nil
+
+		-- Om en nästa värld är satt, laddar vi in den.
+		if nästa then
+			msg.post(nästa, 'load')
+		end
+	elseif message_id == hash('ladda_värld') then
+
+		-- Om vi får ett meddelande att ladda en värld,
+		-- sätter vi nästa till message.till.
+		nästa = message.till
+
+		-- Om vi har en nuvarande värld, måste vi först ladda ur
+		-- den nuvarande världen.
+		if nuvarande then
+			msg.post(nuvarande, 'unload')
+		else
+			-- Annars kan vi bara ladda in nästa värld.
+			msg.post(nästa, 'load')
+		end
+	end
+end

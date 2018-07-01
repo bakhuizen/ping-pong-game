@@ -1,0 +1,24 @@
+local playerL_p = 0
+local playerR_p = 0
+
+function update(self, dt)
+	if playerL_p >= 5 or playerR_p >= 5 then
+		msg.post('main:/loader', 'ladda_värld', { till = '#win' })
+	end
+end
+
+function on_message(self, message_id, message, sender)
+
+	if message_id == hash('playerL') then
+		playerL_p = playerL_p + 1
+		points_node = gui.get_node('playerL')
+		gui.set_text(points_node, playerL_p)
+		
+	elseif message_id == hash('playerR') then
+		playerR_p = playerR_p + 1
+		points_node = gui.get_node('playerR')
+		gui.set_text(points_node, playerR_p)
+		
+	end
+
+end

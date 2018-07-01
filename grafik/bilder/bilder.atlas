@@ -1,0 +1,12 @@
+images {
+  image: "/grafik/bilder/pingisbord.png"
+}
+images {
+  image: "/grafik/bilder/pingpongball.png"
+}
+images {
+  image: "/grafik/bilder/pingpongracket.png"
+}
+margin: 0
+extrude_borders: 0
+inner_padding: 0

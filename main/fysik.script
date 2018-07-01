@@ -1,0 +1,120 @@
+--[[
+======= FYSIK =======
+* Det här skriptet hanterar kollisions-matte & gravitation.
+* För att få kollisioner & gravitation på din spelare / karaktär:
+	- Lägg till skriptet på din spelare.
+	- Se till så att alla objekt i världen har typen Kinematic på sitt kollisionsobjekt
+	- Se till så att alla platformar, hus, etc som du vill kollidera med har gruppen geometri.
+	- Klar!
+
+* Om du klickar på skriptet genom ditt spel-objekt (Alltså du går in på GameObjekt-filen och klickar på skripten), k
+kan du redigera värden som gravitationen, och hur snabbt din karaktär får falla och hoppa.
+* För att ändra på y-hastigheten (t.ex. för att hoppa):
+	- msg.post('#fysik', 'y_hastighet', {y = 100})
+		-> (här kan '10' bytas ut mot annat nummer)
+
+
+Titta gärna runt i koden så kanske du lär dig något :)
+
+--]]
+
+
+-- Den här variabeln kontrollerar hur snabbt vi faller.
+go.property('gravity', 15)
+
+-- Den här variabeln kontrollerar det snabbaste vi får FALLA.
+go.property('minimum_velocity', -500)
+
+-- Den här variabeln kontrollerar det snabbaste vi får HOPPA.
+go.property('maximum_velocity', 500)
+
+-- Den här variabeln berättar för oss om vi står på marken eller inte.
+go.property('på_marken', false)
+
+function init(self)
+	-- correction vector
+	self.correction = vmath.vector3()
+	self.velocity = vmath.vector3()
+
+	size = go.get('#sprite', 'size.y')
+	scale = go.get_scale().y
+	self.height = size * scale
+end
+
+function update(self, dt)
+
+	-- reset correction
+	self.correction = vmath.vector3()
+	
+	-- Om vi inte står på marken, d.v.s. om vi faller, ska vi applicera gravitation.
+	if not self.på_marken then
+
+
+		-- Ändra positionens y-värde med vår nuvarande velocitet.
+		
+
+		-- Se till att vi inte faller för snabbt, om vi inte gör det så applicerar vi gravitation.
+		if self.velocity.y > self.minimum_velocity then
+			self.velocity.y = self.velocity.y - self.gravity
+		end
+		
+	end
+
+	-- Hämta vår nuvarande position.
+	position = go.get_position()
+	
+	-- Sist applicerar vi vår nya position på vårt spelobjekt.
+	go.set_position(position + (self.velocity * dt))
+
+
+	raycast_end = vmath.vector3(position.x, position.y - (self.height / 2) - 7, position.z)
+
+	physics.ray_cast(position, raycast_end, {hash('geometri')})
+	
+	
+
+	-- Eftersom ifall vi står på marken så får vi veta om det (i on_message) varje uppdatering,
+	-- återställer vi den här sist.
+
+end
+
+-- Den här funktionen hanterar kollisionerna.
+local function handle_geometry_contact(self, normal, distance)
+	local proj = vmath.dot(self.correction, normal)
+	local comp = (distance - proj) * normal
+	self.correction = self.correction + comp
+	go.set_position(go.get_position() + comp)
+	if normal.y > 0.7 then
+		self.på_marken = true
+	else
+		self.på_marken = false
+	end
+	proj = vmath.dot(self.velocity, normal)
+	if proj < 0 then
+		self.velocity = self.velocity - proj * normal
+		self.velocity.x = 0
+	end
+end
+
+
+function on_message(self, message_id, message, sender)
+	-- Om vi har kolliderat med geometri, ska vi köra handle_geometry_contact
+	if message_id == hash("contact_point_response") and message.other_group == hash('geometri') then
+		handle_geometry_contact(self, message.normal, message.distance)
+	-- Om vi får meddelanded y_hastighet, betyder det att vi ska ändra vår y-velocitet.
+	elseif message_id == hash('y_hastighet') then
+		-- Om vi ska åka uppåt är vi inte längre på marken.
+		if message.y > 0 then
+			self.på_marken = false
+		end
+		-- Applicera den nya velociteten
+		self.velocity.y = message.y
+	elseif message_id == hash('ray_cast_response') then
+		self.på_marken = true
+	elseif message_id == hash('ray_cast_missed') then
+		self.på_marken = false
+	end
+end
+
+
+

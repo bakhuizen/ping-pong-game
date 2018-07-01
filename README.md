@@ -1,2 +1,2 @@
-# ping-pong-game
-Ping Pong game build with Defold
+# platform-starter
+We really should have done this a while ago

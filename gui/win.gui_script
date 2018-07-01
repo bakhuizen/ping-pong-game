@@ -1,0 +1,14 @@
+function init(self)
+	msg.post('.', 'acquire_input_focus')
+end
+
+function on_input(self, action_id, action)
+	play_again_button = gui.get_node('play_again')
+
+	if gui.pick_node(play_again_button, action.x, action.y) then
+		if action_id == hash('klick') and action.released then
+			msg.post('main:/loader', 'ladda_värld', {till = '#game'})
+		end
+	end
+
+end
