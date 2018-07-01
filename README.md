@@ -1,2 +1,2 @@
-# platform-starter
-We really should have done this a while ago
+# Ping Pong Game
+A simple Ping Pong Game built with Defold. Code written in Lua.
